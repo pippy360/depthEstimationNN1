@@ -6,4 +6,4 @@ I did not write the paper
 
 #TODO: description of the architecture and link the papers that the describe the techniques
 
-
+#TODO: get the cost of inference
