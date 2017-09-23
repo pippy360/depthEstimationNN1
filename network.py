@@ -20,9 +20,28 @@ def conv2d(scope_name, inputs, shape, bias_shape, stride, padding='VALID', wd=0.
     return conv_
 
 def inference():
-    coarse1_conv = conv2d('coarse1', images, [11, 11, 3, 96], [96], [1, 4, 4, 1], padding='VALID', reuse=reuse, trainable=trainable)
-    coarse1 = tf.nn.max_pool(coarse1_conv, ksize=[1, 3, 3, 1], strides=[1, 2, 2, 1], padding='VALID', name='pool1')
-    coarse2_conv = conv2d('coarse2', coarse1, [5, 5, 96, 256], [256], [1, 1, 1, 1], padding='VALID', reuse=reuse, trainable=trainable)
+    #input in an image 240x320x3
+    conv(kernal=[1,7,7,1], outDepth=64, stride=2)#are we sure 64 is output depth????
+    maxPool([3,3], outDepth=whatGoesHere)  
+    
+    #block1
+    #input is 240/2 ????
+    #output
+    
+    #how do we do the skipping?
+    conv([1,1], outDepth=64)
+    conv([3,3], outDepth=64)
+    conv([1,1], outDepth=256)
+    
+    conv([1,1], outDepth=64)
+    conv([3,3], outDepth=64)
+    conv([1,1], outDepth=256)
+    
+    #block repeated twice, which same size input and output
+    
+    #final output of the image is 120x160 (so the stride is only /2 once)
+    #/2 == 2 stride, /8 == 8 stride
+    
     return ""
 
 print inference()
