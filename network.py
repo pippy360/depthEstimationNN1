@@ -1,6 +1,6 @@
 import tensorflow as tf
 
-def conv2d(scope_name, inputs, shape, bias_shape, stride, padding='VALID', wd=0.0, reuse=False, trainable=True):
+def conv2d(scope_name, inputs, shape, stride, padding='VALID', wd=0.0, reuse=False, trainable=True):
     with tf.variable_scope(scope_name) as scope:
         if reuse is True:
             scope.reuse_variables()
@@ -12,15 +12,32 @@ def conv2d(scope_name, inputs, shape, bias_shape, stride, padding='VALID', wd=0.
             trainable=trainable
         )
         conv = tf.nn.conv2d(inputs, kernel, stride, padding=padding)
-        #FIXME: Maybe replace the gpu here?
-        biases = _variable_on_gpu('biases', bias_shape, tf.constant_initializer(0.1))
-        #TODO: What are these biases for???? Why??? are they trained???
-        bias = tf.nn.bias_add(conv, biases)
-        conv_ = tf.nn.relu(bias, name=scope.name)
     return conv_
 
 def inference():
+
+    #BLOCK 0 ... there must always be a RELU between convolutions
+    convToken1 = conv2d("Block0", images, [7, 7, 3, 64], [1, 2, 2, 1], padding='SAME')
+    convToken2 = tf.nn.max_pool(convToken1, ksize=[1, 3, 3, 1], strides=[1, 2, 2, 1], padding='SAME', name='pool1')
+
+    #BLOCK 1
+    convToken2 = conv2d("Block1", images, [1, 1, 3, 64], [1, 2, 2, 1], padding='SAME')
+    conv1 = tf.nn.relu(pre_activation, name=scope.name)
+    convToken3 = conv2d("Block1", images, [7, 7, 3, 64], [1, 2, 2, 1], padding='SAME')
+    conv1 = tf.nn.relu(pre_activation, name=scope.name)
+    convToken3 = conv2d("Block1", images, [7, 7, 3, 64], [1, 2, 2, 1], padding='SAME')
+    #some sort 
+    #add them now before the activation function
+    conv1 = tf.nn.relu(pre_activation, name=scope.name)
+    
+    
+    convToken2 = conv2d("Block0", images, [5, 5, 3, 64], [1, 2, 2, 1], padding='SAME')
+    convToken3 = conv2d("Block0", images, [5, 5, 3, 64], [1, 2, 2, 1], padding='SAME')
+
+    #convolution from the paper might include a relu layer
+    
     #input in an image 240x320x3
+    
     conv(kernal=[1,7,7,1], outDepth=64, stride=2)#are we sure 64 is output depth????
     maxPool([3,3], outDepth=whatGoesHere)  
     
