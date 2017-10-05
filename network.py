@@ -17,42 +17,30 @@ def conv2d(scope_name, inputs, shape, stride, padding='VALID', wd=0.0, reuse=Fal
 def inference():
 
     #BLOCK 0
+    block1Output = ''#FIXME:::::::::
     {
-        blockToken1 = conv2d("Block0", images, [7, 7, 3, 64], [1, 2, 2, 1], padding='SAME')
-        blockToken2 = tf.nn.relu(blockToken1, name=scope.name)
-        block0MaxPool = tf.nn.max_pool(blockToken2, ksize=[1, 3, 3, 1], strides=[1, 2, 2, 1], padding='SAME', name='pool1')
+        blockToken1 = conv2d("Block0", images, shape=[7, 7, 3, 64], stride=[1, 2, 2, 1], padding='SAME')
+        blockToken2 = tf.contrib.layers.batch_norm(blockToken1)
+        scaleFactor = _variable_with_weight_decay(
+            'scaleWeight',
+            shape=[1],
+            stddev=0.01,
+            wd=0.0,
+            trainable=trainable
+        )
+        blockToken3 = tf.multiply(blockToken2, scaleFactor)
+        addFactor = _variable_with_weight_decay(
+            'addWeight',
+            shape=[1],
+            stddev=0.01,
+            wd=0.0,
+            trainable=trainable
+        )
+        blockToken4 = tf.add(blockToken3, addFactor)
+        blockToken5 = tf.nn.relu(blockToken4, name=scope.name)
+        block1Output = blockToken5
     }
 
-    #BLOCK 1
-    {
-        risidualOriginal
-        convToken2 = conv2d("Block1", images, [1, 1, 3, 64], [1, 2, 2, 1], padding='SAME')
-        conv1 = tf.nn.relu(pre_activation, name=scope.name)
-        convToken3 = conv2d("Block1", images, [7, 7, 3, 64], [1, 2, 2, 1], padding='SAME')
-        conv1 = tf.nn.relu(pre_activation, name=scope.name)
-        convToken3 = conv2d("Block1", images, [7, 7, 3, 64], [1, 2, 2, 1], padding='SAME')
-        pre_activation = tf.nn.bias_add(convToken3, risidualOriginal)
-        conv1 = tf.nn.relu(pre_activation, name=scope.name)
-    }
-    
-    #BLOCK 2
-    {
-    
-    }
-    
-    #convolution from the paper might include a relu layer
-    
-    #input in an image 240x320x3
-    
-    conv(kernal=[1,7,7,1], outDepth=64, stride=2)#are we sure 64 is output depth????
-    maxPool([3,3], outDepth=whatGoesHere)  
-    
-    #block1
-    #input is 240/2 ????
-    #output
-    
-    #final output of the image is 120x160 (so the stride is only /2 once)
-    
-    return ""
+    return block1Output
 
 print inference()
