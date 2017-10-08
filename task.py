@@ -16,7 +16,7 @@ TRAIN_FILE = "train.csv"
 COARSE_DIR = "coarse"
 REFINE_DIR = "refine"
 
-REFINE_TRAIN = True
+REFINE_TRAIN = False
 FINE_TUNE = True
 
 def train():
