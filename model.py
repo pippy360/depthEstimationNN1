@@ -116,15 +116,15 @@ def maxPool(scope_name, inputs, kernelSize, stride):
         max1 = tf.nn.max_pool(inputs, [1, kernelSize, kernelSize, 1], [1, stride, stride, 1], padding='SAME')
         return max1
 
-def resizeLayer(scope_name, inputs, smallSize, bigSize, stride=1):
+def resizeLayer(scope_name, inputs, initInputSize, smallSize, bigSize, stride=1):
     
     with tf.variable_scope(scope_name) as scope:
-        conv1 = oneRun("conv2", inputs, convOutputSize=smallSize, inChannels=smallSize, kernelSize=1, stride=stride)
+        conv1 = oneRun("conv2", inputs, convOutputSize=smallSize, inChannels=initInputSize, kernelSize=1, stride=stride)
         conv1 = oneRun("conv3", conv1, convOutputSize=smallSize, inChannels=smallSize,  kernelSize=3, stride=1)
         conv1 = oneRunWithoutRelu("conv4", conv1, convOutputSize=bigSize, inChannels=smallSize, kernelSize=1, stride=1)
 
         #resize the original input
-        conv1b = oneRunWithoutRelu("conv5", inputs, convOutputSize=bigSize, inChannels=smallSize, kernelSize=1, stride=stride)
+        conv1b = oneRunWithoutRelu("conv5", inputs, convOutputSize=bigSize, inChannels=initInputSize, kernelSize=1, stride=stride)
 
         #concat
         conv1 = conv1 + conv1b
@@ -132,10 +132,10 @@ def resizeLayer(scope_name, inputs, smallSize, bigSize, stride=1):
 
         return conv1
 
-def nonResizeLayer(scope_name, inputs, smallSize, bigSize):
+def nonResizeLayer(scope_name, inputs, initInputSize, smallSize, bigSize):
 
     with tf.variable_scope(scope_name) as scope:
-        conv1 = oneRun("conv2", inputs, convOutputSize=smallSize, inChannels=smallSize, kernelSize=1, stride=1)
+        conv1 = oneRun("conv2", inputs, convOutputSize=smallSize, inChannels=initInputSize, kernelSize=1, stride=1)
         conv1 = oneRun("conv3", conv1, convOutputSize=smallSize, inChannels=smallSize,  kernelSize=3, stride=1)
         conv1 = oneRunWithoutRelu("conv4", conv1, convOutputSize=bigSize, inChannels=smallSize, kernelSize=1, stride=1)
 
@@ -151,14 +151,21 @@ def inference(images, reuse=False, trainable=True):
     conv1 = oneRun("conv1", images, convOutputSize=64, inChannels=3, kernelSize=7, stride=2)
     conv1b = maxPool("max1", conv1, kernelSize=3, stride=2)
 
-    conv1 = resizeLayer("resize1", conv1b, smallSize=64, bigSize=256, stride=2)
+    conv1 = resizeLayer("resize1", conv1b, 64, smallSize=64, bigSize=256, stride=2)
+    
+    for i in range(5):
+        conv1 = nonResizeLayer("resize2"+str(i), conv1, initInputSize=256, smallSize=64, bigSize=256)
+    
+    conv1 = resizeLayer("resize3", conv1, initInputSize=256, smallSize=128, bigSize=512)
 
+    for i in range(5):
+        conv1 = nonResizeLayer("resize4"+str(i), conv1, initInputSize=512, smallSize=128, bigSize=512)
+    
+    
+    conv1 = oneRun("conv99", conv1, convOutputSize=3, inChannels=512, kernelSize=3, stride=2)
 
-    conv1 = oneRun("conv99", conv1, convOutputSize=2, inChannels=256, kernelSize=3, stride=3)
-
-    coarse6 = fc('coarse6', conv1, [7904, 4096], [4096], reuse=reuse, trainable=True)
-    coarse7 = fc('coarse7', coarse6, [4096, 4070], [4070], reuse=reuse, trainable=True)
-    coarse7_output = tf.reshape(coarse7, [-1, 55, 74, 1])
+    coarse6 = fc('coarse6', conv1, [6840, 4070], [4070], reuse=reuse, trainable=True)
+    coarse7_output = tf.reshape(coarse6, [-1, 55, 74, 1])
     print "coarse7_output"
     print coarse7_output
     return coarse7_output
