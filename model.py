@@ -124,10 +124,10 @@ def resizeLayer(scope_name, inputs, smallSize, bigSize, stride=1):
         conv1 = oneRunWithoutRelu("conv4", conv1, convOutputSize=bigSize, inChannels=smallSize, kernelSize=1, stride=1)
 
         #resize the original input
-        conv1b = oneRunWithoutRelu("conv5", conv1b, convOutputSize=bigSize, inChannels=smallSize, kernelSize=1, stride=stride)
+        conv1b = oneRunWithoutRelu("conv5", inputs, convOutputSize=bigSize, inChannels=smallSize, kernelSize=1, stride=stride)
 
         #concat
-        conv1 = conv1 + inputs
+        conv1 = conv1 + conv1b
         conv1 = tf.nn.relu(conv1, 'relu')
 
         return conv1
