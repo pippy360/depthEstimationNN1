@@ -116,24 +116,43 @@ def maxPool(scope_name, inputs, kernelSize, stride):
         max1 = tf.nn.max_pool(inputs, [1, kernelSize, kernelSize, 1], [1, stride, stride, 1], padding='SAME')
         return max1
 
-def inference(images, reuse=False, trainable=True):
-    #input should be [n,240,320,3]
+def resizeLayer(scope_name, inputs, smallSize, bigSize, stride=1):
+    
+    with tf.variable_scope(scope_name) as scope:
+        conv1 = oneRun("conv2", inputs, convOutputSize=smallSize, inChannels=smallSize, kernelSize=1, stride=stride)
+        conv1 = oneRun("conv3", conv1, convOutputSize=smallSize, inChannels=smallSize,  kernelSize=3, stride=1)
+        conv1 = oneRunWithoutRelu("conv4", conv1, convOutputSize=bigSize, inChannels=smallSize, kernelSize=1, stride=1)
 
-    #connect these two layers
+        #resize the original input
+        conv1b = oneRunWithoutRelu("conv5", conv1b, convOutputSize=bigSize, inChannels=smallSize, kernelSize=1, stride=stride)
+
+        #concat
+        conv1 = conv1 + inputs
+        conv1 = tf.nn.relu(conv1, 'relu')
+
+        return conv1
+
+def nonResizeLayer(scope_name, inputs, smallSize, bigSize):
+
+    with tf.variable_scope(scope_name) as scope:
+        conv1 = oneRun("conv2", conv1b, convOutputSize=smallSize, inChannels=smallSize, kernelSize=1, stride=1)
+        conv1 = oneRun("conv3", conv1, convOutputSize=smallSize, inChannels=smallSize,  kernelSize=3, stride=1)
+        conv1 = oneRunWithoutRelu("conv4", conv1, convOutputSize=bigSize, inChannels=smallSize, kernelSize=1, stride=1)
+
+        #concat
+        conv1 = conv1 + conv1b
+        conv1 = tf.nn.relu(conv1, 'relu')
+
+        return conv1
+
+def inference(images, reuse=False, trainable=True):
+
+    #first bit
     conv1 = oneRun("conv1", images, convOutputSize=64, inChannels=3, kernelSize=7, stride=2)
     conv1b = maxPool("max1", conv1, kernelSize=3, stride=2)
 
-    conv1 = oneRun("conv2", conv1b, convOutputSize=64, inChannels=64, kernelSize=1, stride=1)
-    print "max2 conv done"
-    conv1 = oneRun("conv3", conv1, convOutputSize=64, inChannels=64,  kernelSize=3, stride=1)
-    conv1 = oneRunWithoutRelu("conv4", conv1, convOutputSize=256, inChannels=64, kernelSize=1, stride=1)
+    conv1 = resizeLayer(conv1b, smallSize=64, bigSize=256, stride=2)
 
-    #resize the original input
-    conv1b = oneRunWithoutRelu("conv5", conv1b, convOutputSize=256, inChannels=64, kernelSize=1, stride=1)
-
-    #concat
-    conv1 = conv1 + conv1b
-    conv1 = tf.nn.relu(conv1, 'relu')
 
     conv1 = oneRun("conv99", conv1, convOutputSize=2, inChannels=256, kernelSize=3, stride=3)
 
