@@ -23,8 +23,6 @@ def _variable_on_gpu(name, shape, initializer):
 
 def conv2d(scope_name, inputs, shape, bias_shape, stride, padding='VALID', wd=0.0, trainable=True):
     with tf.variable_scope(scope_name) as scope:
-        if reuse is True:
-            scope.reuse_variables()
         kernel = _variable_with_weight_decay(
             'weights',
             shape=shape,
@@ -61,24 +59,24 @@ def fc(scope_name, inputs, shape, bias_shape, wd=0.04, reuse=False, trainable=Tr
         fc = tf.nn.relu_layer(flat, weights, biases, name=scope.name)
         return fc
 
-def oneRun(scope_name, input, convOutputSize, kernelSize=3, stride=1):
+def oneRun(scope_name, inputs, convOutputSize, kernelSize=3, stride=1):
     with tf.variable_scope(scope_name) as scope:
         wd = 0.0
-        conv1 = conv2d('conv1', input, [kernelSize, kernelSize, 3, convOutputSize], [convOutputSize], [1, stride, stride, 1], padding='SAME', trainable=trainable)
+        conv1 = conv2d('conv1', inputs, [kernelSize, kernelSize, 3, convOutputSize], [convOutputSize], [1, stride, stride, 1], padding='SAME', trainable=True)
         conv1 = tf.contrib.layers.batch_norm(conv1)
         multScalar = _variable_with_weight_decay(
                 'multWeight',
                 shape=[1],
                 stddev=0.01,
                 wd=wd,
-                trainable=trainable
+                trainable=True
             )
         addScalar = _variable_with_weight_decay(
                 'addWeight',
                 shape=[1],
                 stddev=0.01,
                 wd=wd,
-                trainable=trainable
+                trainable=True
             )
 
         conv1 = tf.multiply(conv1, multScalar)#try removing these and see what happens
@@ -86,19 +84,21 @@ def oneRun(scope_name, input, convOutputSize, kernelSize=3, stride=1):
         conv1 = tf.nn.relu(conv1, 'relu')
         return conv1
 
-def maxPool(scope_name, input, kernelSize, stride):
+def maxPool(scope_name, inputs, kernelSize, stride):
     with tf.variable_scope(scope_name) as scope:
-        conv1 = tf.nn.max_pool(input, [1, kernelSize, kernelSize, 1], [1, stride, stride, 1], padding='SAME')
+        max1 = tf.nn.max_pool(inputs, [1, kernelSize, kernelSize, 1], [1, stride, stride, 1], padding='SAME')
+        return max1
 
 def inference(images, reuse=False, trainable=True):
     #input should be [n,240,320,3]
 
     #connect these two layers
     conv1 = oneRun("conv1", images, convOutputSize=64, kernelSize=7, stride=2)
-    conv1 = max_pool("max1", conv1, kernelSize=3, stride=2)
+    conv1 = maxPool("max1", conv1, kernelSize=3, stride=2)
     conv1 = oneRun("conv2", conv1, convOutputSize=64, kernelSize=7, stride=2)
-    coarse6 = fc('coarse6', conv1, [4560, 4096], [4096], reuse=reuse, trainable=trainable)
-    coarse7 = fc('coarse7', coarse6, [4096, 4070], [4070], reuse=reuse, trainable=trainable)
+    conv1 = oneRun("conv2", conv1, convOutputSize=10, kernelSize=7, stride=2)
+    coarse6 = fc('coarse6', conv1, [4560, 4096], [4096], reuse=reuse, trainable=True)
+    coarse7 = fc('coarse7', coarse6, [4096, 4070], [4070], reuse=reuse, trainable=True)
     coarse7_output = tf.reshape(coarse7, [8, 55, 74, 1])
     print "coarse7_output"
     print coarse7_output
