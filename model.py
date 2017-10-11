@@ -151,7 +151,7 @@ def inference(images, reuse=False, trainable=True):
     conv1 = oneRun("conv1", images, convOutputSize=64, inChannels=3, kernelSize=7, stride=2)
     conv1b = maxPool("max1", conv1, kernelSize=3, stride=2)
 
-    conv1 = resizeLayer(conv1b, smallSize=64, bigSize=256, stride=2)
+    conv1 = resizeLayer("resize1", conv1b, smallSize=64, bigSize=256, stride=2)
 
 
     conv1 = oneRun("conv99", conv1, convOutputSize=2, inChannels=256, kernelSize=3, stride=3)
