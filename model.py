@@ -135,12 +135,12 @@ def resizeLayer(scope_name, inputs, smallSize, bigSize, stride=1):
 def nonResizeLayer(scope_name, inputs, smallSize, bigSize):
 
     with tf.variable_scope(scope_name) as scope:
-        conv1 = oneRun("conv2", conv1b, convOutputSize=smallSize, inChannels=smallSize, kernelSize=1, stride=1)
+        conv1 = oneRun("conv2", inputs, convOutputSize=smallSize, inChannels=smallSize, kernelSize=1, stride=1)
         conv1 = oneRun("conv3", conv1, convOutputSize=smallSize, inChannels=smallSize,  kernelSize=3, stride=1)
         conv1 = oneRunWithoutRelu("conv4", conv1, convOutputSize=bigSize, inChannels=smallSize, kernelSize=1, stride=1)
 
         #concat
-        conv1 = conv1 + conv1b
+        conv1 = conv1 + inputs
         conv1 = tf.nn.relu(conv1, 'relu')
 
         return conv1
