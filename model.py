@@ -84,6 +84,31 @@ def oneRun(scope_name, inputs, convOutputSize, kernelSize=3, stride=1):
         conv1 = tf.nn.relu(conv1, 'relu')
         return conv1
 
+def oneRunWithoutRelu(scope_name, inputs, convOutputSize, kernelSize=3, stride=1):
+    with tf.variable_scope(scope_name) as scope:
+        wd = 0.0
+        conv1 = conv2d('conv1', inputs, [kernelSize, kernelSize, 3, convOutputSize], [convOutputSize], [1, stride, stride, 1], padding='SAME', trainable=True)
+        conv1 = tf.contrib.layers.batch_norm(conv1)
+        multScalar = _variable_with_weight_decay(
+                'multWeight',
+                shape=[1],
+                stddev=0.01,
+                wd=wd,
+                trainable=True
+            )
+        addScalar = _variable_with_weight_decay(
+                'addWeight',
+                shape=[1],
+                stddev=0.01,
+                wd=wd,
+                trainable=True
+            )
+
+        conv1 = tf.multiply(conv1, multScalar)#try removing these and see what happens
+        conv1 = tf.add(conv1, addScalar)#try removing these and see what happens
+        return conv1
+
+
 def maxPool(scope_name, inputs, kernelSize, stride):
     with tf.variable_scope(scope_name) as scope:
         max1 = tf.nn.max_pool(inputs, [1, kernelSize, kernelSize, 1], [1, stride, stride, 1], padding='SAME')
@@ -94,9 +119,21 @@ def inference(images, reuse=False, trainable=True):
 
     #connect these two layers
     conv1 = oneRun("conv1", images, convOutputSize=64, kernelSize=7, stride=2)
-    conv1 = maxPool("max1", conv1, kernelSize=3, stride=2)
-    conv1 = oneRun("conv2", conv1, convOutputSize=64, kernelSize=7, stride=2)
-    conv1 = oneRun("conv2", conv1, convOutputSize=10, kernelSize=7, stride=2)
+    conv1b = maxPool("max1", conv1, kernelSize=3, stride=2)
+
+    conv1 = oneRun("conv2", conv1b, convOutputSize=64,  kernelSize=1, stride=1)
+    conv1 = oneRun("conv3", conv1, convOutputSize=64,  kernelSize=3, stride=1)
+    conv1 = oneRunWithoutRelu("conv4", conv1, convOutputSize=256, kernelSize=1, stride=1)
+
+    #resize the original input
+    conv1b = oneRunWithoutRelu("conv5", conv1b, convOutputSize=256, kernelSize=1, stride=1)
+
+    #concat
+    conv1 = conv1 + conv1b
+    conv1 = tf.nn.relu(conv1, 'relu')
+
+    #conv1 = oneRun("conv3", conv1, convOutputSize=64,  kernelSize=3, stride=1)
+
     coarse6 = fc('coarse6', conv1, [4560, 4096], [4096], reuse=reuse, trainable=True)
     coarse7 = fc('coarse7', coarse6, [4096, 4070], [4070], reuse=reuse, trainable=True)
     coarse7_output = tf.reshape(coarse7, [8, 55, 74, 1])
