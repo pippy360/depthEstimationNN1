@@ -193,7 +193,7 @@ def inference(images, reuse=False, trainable=True):
 
     conv1 = conv2d('convFinal', conv1, [3, 3, 7168, 200], [200], [1, 1, 1, 1], padding='SAME', trainable=True)
         
-    conv1 = tf.layers.conv2d_transpose(conv1, 1, 8, strides=(4, 4), padding='VALID')
+    conv1 = tf.layers.conv2d_transpose(conv1, 1, 8, strides=(4, 4), padding='SAME')
 
     return conv1
 
