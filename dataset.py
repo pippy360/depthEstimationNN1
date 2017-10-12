@@ -3,10 +3,10 @@ from tensorflow.python.platform import gfile
 import numpy as np
 from PIL import Image
 
-IMAGE_HEIGHT = 228
-IMAGE_WIDTH = 304
-TARGET_HEIGHT = 55
-TARGET_WIDTH = 74
+IMAGE_HEIGHT = 240
+IMAGE_WIDTH = 320
+TARGET_HEIGHT = 120
+TARGET_WIDTH = 160
 
 class DataSet:
     def __init__(self, batch_size):
