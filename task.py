@@ -45,8 +45,8 @@ def train():
                 if variable_name.find('fine') >= 0:
                     refine_params[variable_name] = variable
             # define saver
-            print coarse_params
-            saver_coarse = tf.train.Saver(coarse_params)
+            #print coarse_params
+            #saver_coarse = tf.train.Saver(coarse_params)
 
             # train
             coord = tf.train.Coordinator()
