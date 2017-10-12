@@ -151,17 +151,38 @@ def inference(images, reuse=False, trainable=True):
     conv1 = oneRun("conv1", images, convOutputSize=64, inChannels=3, kernelSize=7, stride=2)
     conv1b = maxPool("max1", conv1, kernelSize=3, stride=2)
 
-    conv1 = resizeLayer("resize1", conv1b, 64, smallSize=64, bigSize=256, stride=2)
+    conv1 = resizeLayer("resize1", conv1b, initInputSize=64, smallSize=64, bigSize=256)
     
-    for i in range(5):
+    for i in range(2):
         conv1 = nonResizeLayer("resize2"+str(i), conv1, initInputSize=256, smallSize=64, bigSize=256)
     
-    conv1 = resizeLayer("resize3", conv1, initInputSize=256, smallSize=128, bigSize=512)
+    conv1 = resizeLayer("resize3", conv1, initInputSize=256, smallSize=128, bigSize=512, stride=2)
 
-    for i in range(5):
+    l1concat = conv1
+
+    for i in range(7):
         conv1 = nonResizeLayer("resize4"+str(i), conv1, initInputSize=512, smallSize=128, bigSize=512)
     
-    
+    l2concat = conv1
+
+    conv1 = resizeLayer("resize5", conv1, initInputSize=512, smallSize=256, bigSize=1024)
+
+    l3concat = conv1
+
+    for i in range(35):
+        conv1 = nonResizeLayer("resize6"+str(i), conv1, initInputSize=1024, smallSize=256, bigSize=1024)
+
+    l4concat = conv1
+
+    conv1 = resizeLayer("resize7", conv1, initInputSize=1024, smallSize=512, bigSize=2048)
+
+    l5concat = conv1
+
+    for i in range(2):
+        conv1 = nonResizeLayer("resize8"+str(i), conv1, initInputSize=2048, smallSize=512, bigSize=2048)
+
+    l6concat = conv1
+
     conv1 = oneRun("conv99", conv1, convOutputSize=3, inChannels=512, kernelSize=3, stride=2)
 
     coarse6 = fc('coarse6', conv1, [6840, 4070], [4070], reuse=reuse, trainable=True)
