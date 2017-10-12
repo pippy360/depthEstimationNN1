@@ -184,8 +184,10 @@ def inference(images, reuse=False, trainable=True):
     conv1 = conv2d('convFinal', conv1, [3, 3, 7168, 200], [200], [1, 1, 1, 1], padding='SAME', trainable=True)
         
     conv1 = tf.layers.conv2d_transpose(conv1, 1, 8, strides=(4, 4))
-
-    conv1 = oneRun("conv99", conv1, convOutputSize=3, inChannels=2048, kernelSize=3, stride=2)
+    print "the conv at this point:"
+    print conv1
+    
+    conv1 = oneRun("conv99", conv1, convOutputSize=3, inChannels=1, kernelSize=3, stride=2)
 
     coarse6 = fc('coarse6', conv1, [6840, 4070], [4070], reuse=reuse, trainable=True)
     coarse7_output = tf.reshape(coarse6, [-1, 55, 74, 1])
