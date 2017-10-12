@@ -183,7 +183,7 @@ def inference(images, reuse=False, trainable=True):
 
     l6concat = conv1
 
-    conv1 = oneRun("conv99", conv1, convOutputSize=3, inChannels=512, kernelSize=3, stride=2)
+    conv1 = oneRun("conv99", conv1, convOutputSize=3, inChannels=2048, kernelSize=3, stride=2)
 
     coarse6 = fc('coarse6', conv1, [6840, 4070], [4070], reuse=reuse, trainable=True)
     coarse7_output = tf.reshape(coarse6, [-1, 55, 74, 1])
