@@ -198,8 +198,8 @@ def inference(images, reuse=False, trainable=True):
     return conv1
 
 def loss(logits, depths, invalid_depths):
-    logits_flat = tf.reshape(logits, [-1, 55*74])
-    depths_flat = tf.reshape(depths, [-1, 55*74])
+    logits_flat = tf.reshape(logits, [-1, 120*160])
+    depths_flat = tf.reshape(depths, [-1, 120*160])
     print "logits_flat"
     print logits_flat
     print "depths_flat"
