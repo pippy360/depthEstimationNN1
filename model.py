@@ -43,13 +43,7 @@ def fc(scope_name, inputs, shape, bias_shape, wd=0.04, reuse=False, trainable=Tr
 
     with tf.variable_scope(scope_name) as scope:
 
-        print "inputs"
-        print inputs
-        print [-1, shape[0]]
         flat = tf.reshape(inputs, [-1, shape[0]])
-        print "Creating fully connected layer with:"
-        print flat
-        print "#######"
         weights = _variable_with_weight_decay(
             'weights',
             shape,
