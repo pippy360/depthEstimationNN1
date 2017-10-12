@@ -142,8 +142,8 @@ def inference(images, reuse=False, trainable=True):
     conv1b = maxPool("max1", conv1, kernelSize=3, stride=2)
 
     conv1 = resizeLayer("resize1", conv1b, initInputSize=64, smallSize=64, bigSize=256)
-    print "concat"
-    print concat
+    print "conv1"
+    print conv1
     
     for i in range(2):
         conv1 = nonResizeLayer("resize2"+str(i), conv1, initInputSize=256, smallSize=64, bigSize=256)
