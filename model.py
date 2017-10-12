@@ -185,7 +185,7 @@ def inference(images, reuse=False, trainable=True):
 
     conv1 = tf.concat([l1concat, l2concat, l3concat, l4concat, l5concat, l6concat], 3)
 
-    conv1 = dropout(conv1, [1, 1, 1, .5])
+    conv1 = tf.nn.dropout(conv1, [1, 1, 1, .5])
 
     conv1 = conv2d('convFinal', conv1, [3, 3, 2048, 200], [200], [1, 1, 1, 1], padding='SAME', trainable=True)
         
