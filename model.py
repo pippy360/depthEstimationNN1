@@ -183,7 +183,7 @@ def inference(images, reuse=False, trainable=True):
 
     l6concat = conv1
 
-    conv1 = tf.concat([l1concat, l2concat, l3concat, l4concat, l5concat, l6concat], 4)
+    conv1 = tf.concat([l1concat, l2concat, l3concat, l4concat, l5concat, l6concat], 3)
 
     conv1 = dropout(conv1, [1, 1, 1, .5])
 
