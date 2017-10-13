@@ -8,6 +8,12 @@ sudo apt-get install python-numpy python-dev python-pip python-wheel -y
 sudo apt-get install libcupti-dev -y
 sudo pip install six numpy wheel 
 
+echo "deb [arch=amd64] http://storage.googleapis.com/bazel-apt stable jdk1.8" | sudo tee /etc/apt/sources.list.d/bazel.list
+curl https://bazel.build/bazel-release.pub.gpg | sudo apt-key add -
+sudo apt-get update
+sudo apt-get install bazel
+sudo apt-get upgrade bazel
+
 # install CUDA Toolkit v8.0
 # instructions from https://developer.nvidia.com/cuda-downloads (linux -> x86_64 -> Ubuntu -> 16.04 -> deb (network))
 CUDA_REPO_PKG="cuda-repo-ubuntu1604_8.0.61-1_amd64.deb"
