@@ -4,8 +4,8 @@ pip install tensorflow pillow
 
 git clone https://github.com/tensorflow/tensorflow 
 cd tensorflow
-sudo apt-get install python-numpy python-dev python-pip python-wheel
-sudo apt-get install libcupti-dev 
+sudo apt-get install python-numpy python-dev python-pip python-wheel -y
+sudo apt-get install libcupti-dev -y
 sudo pip install six numpy wheel 
 
 # install CUDA Toolkit v8.0
