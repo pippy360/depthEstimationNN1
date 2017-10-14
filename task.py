@@ -34,8 +34,8 @@ def train():
             # parameters
             # Merge all the summaries and write them out to /tmp/mnist_logs (by default)
             merged = tf.summary.merge_all()
-            train_writer = tf.summary.FileWriter(FLAGS.summaries_dir + '/train', sess.graph)
-            test_writer = tf.summary.FileWriter(FLAGS.summaries_dir + '/test')
+            train_writer = tf.summary.FileWriter('./train', sess.graph)
+            test_writer = tf.summary.FileWriter('./test')
             tf.global_variables_initializer().run()
             
             for variable in tf.trainable_variables():
@@ -67,10 +67,10 @@ def train():
 
 
 def main(argv=None):
-    if not gfile.Exists(COARSE_DIR):
-        gfile.MakeDirs(COARSE_DIR)
-    if not gfile.Exists(REFINE_DIR):
-        gfile.MakeDirs(REFINE_DIR)
+    if not gfile.Exists("./train"):
+        gfile.MakeDirs("./train")
+    if not gfile.Exists("./test"):
+        gfile.MakeDirs("./test")
     train()
 
 
